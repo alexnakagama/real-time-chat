@@ -2,18 +2,10 @@ package main
 
 import (
 	"fmt"
-	"log"
-
-	"github.com/joho/godotenv"
+	"real-time-chat/config"
 )
 
-func init() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Println("The .env file could not be charged")
-	}
-}
-
 func main() {
+	config.LoadEnv()
 	fmt.Println("Hello world")
 }

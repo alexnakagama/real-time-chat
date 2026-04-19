@@ -1,13 +1,14 @@
 package auth
 
 import (
-	"os"
 	"time"
+
+	"real-time-chat/config"
 
 	"github.com/golang-jwt/jwt/v5"
 )
 
-var jwtSecret = []byte(os.Getenv("JWT_SECRET"))
+var jwtSecret = []byte(config.JWTSecret)
 
 type Claims struct {
 	UserID   string `json:"user_id"`

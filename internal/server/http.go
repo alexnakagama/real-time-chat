@@ -40,5 +40,5 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func SetupRoutes() {
-	http.HandleFunc("/register", RegisterHandler)
+	http.Handle("/register", CORSMiddleware(RateLimitMiddleware(http.HandlerFunc(RegisterHandler))))
 }

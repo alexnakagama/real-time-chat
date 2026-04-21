@@ -6,7 +6,7 @@ import (
 	"real-time-chat/internal/db"
 )
 
-func RegisterUser(username, password string) error {
+func RegisterUser(username, password string, email string) error {
 	hash, err := GeneratePasswordHash(password)
 	if err != nil {
 		return err
@@ -14,8 +14,8 @@ func RegisterUser(username, password string) error {
 
 	_, err = db.Pool.Exec(
 		context.Background(),
-		"INSERT INTO users (username, password_hash) VALUES ($1, $2)",
-		username, hash,
+		"INSERT INTO users (username, password_hash, email) VALUES ($1, $2, $3)",
+		username, hash, email,
 	)
 	return err
 }

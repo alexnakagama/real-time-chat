@@ -11,8 +11,8 @@ import (
 
 type RegisterRequest struct {
 	Username string `json:"username"`
-	Email    string `json:"email"`
 	Password string `json:"password"`
+	Email    string `json:"email"`
 }
 
 type LoginRequest struct {
@@ -47,7 +47,7 @@ func RegisterHandler(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	err := auth.RegisterUser(req.Username, req.Password)
+	err := auth.RegisterUser(req.Username, req.Password, req.Email)
 	if err != nil {
 		http.Error(w, "error registering user: "+err.Error(), http.StatusInternalServerError)
 		return

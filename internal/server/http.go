@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"net/http"
 	"real-time-chat/internal/auth"
+	"real-time-chat/internal/db"
+	"time"
 )
 
 type RegisterRequest struct {
@@ -15,6 +17,10 @@ type RegisterRequest struct {
 type LoginRequest struct {
 	Username string `json:"username"`
 	Password string `json:"password"`
+}
+
+type ForgotPasswordRequest struct {
+	Email string `json:"email"`
 }
 
 // RegisterHandler godoc
@@ -80,7 +86,51 @@ func LoginHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(map[string]string{"token": token})
 }
 
+// ForgotPasswordHandler godoc
+// @Summary      Forgot Password
+// @Description  Sends a password reset link to the user's email
+// @Tags         auth
+// @Accept       json
+// @Produce      plain
+// @Param        request body ForgotPasswordRequest true "User email"
+// @Success      200 {string} string "reset link sent"
+// @Failure      400 {string} string "invalid request"
+// @Failure      500 {string} string "error sending reset link"
+// @Router       /forgot-password [post]
+func ForgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
+	var req ForgotPasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
+
+	user, err := db.GetUserByEmail(req.Email)
+	if err != nil {
+		w.Write([]byte("reset link sent"))
+		return
+	}
+
+	token, err := auth.GenerateResetToken()
+	if err != nil {
+		http.Error(w, "error generating token", http.StatusInternalServerError)
+		return
+	}
+
+	err = db.SavePasswordResetToken(user.ID, token, time.Now().Add(1*time.Hour))
+	if err != nil {
+		http.Error(w, "error saving token", http.StatusInternalServerError)
+		return
+	}
+
+	resetLink := fmt.Sprintf("https://tuapp.com/reset-password?token=%s", token)
+	fmt.Println("Reset link:", resetLink)
+	// In prod here you send the real one
+
+	w.Write([]byte("reset link sent"))
+}
+
 func SetupRoutes() {
 	http.Handle("/register", CORSMiddleware(RateLimitMiddleware(http.HandlerFunc(RegisterHandler))))
 	http.Handle("/login", CORSMiddleware(RateLimitMiddleware(http.HandlerFunc(LoginHandler))))
+	http.Handle("/forgot-password", CORSMiddleware(RateLimitMiddleware(http.HandlerFunc(ForgotPasswordHandler))))
 }

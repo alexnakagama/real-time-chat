@@ -23,6 +23,11 @@ type ForgotPasswordRequest struct {
 	Email string `json:"email"`
 }
 
+type ResetPasswordRequest struct {
+	Token       string `json:"token"`
+	NewPassword string `json:"new_password"`
+}
+
 // RegisterHandler godoc
 // @Summary      Register User
 // @Description  Registers a new user
@@ -129,8 +134,37 @@ func ForgotPasswordHandler(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte("reset link sent"))
 }
 
+// ResetPasswordHandler godoc
+// @Summary      Reset Password
+// @Description  Resets the user password using a valid reset token
+// @Tags         auth
+// @Accept       json
+// @Produce      plain
+// @Param        request body ResetPasswordRequest true "Reset password data"
+// @Success      200 {string} string "password reset successful"
+// @Failure      400 {string} string "invalid request"
+// @Failure      401 {string} string "invalid or expired token"
+// @Failure      500 {string} string "could not reset password"
+// @Router       /reset-password [post]
+func ResetPasswordHandler(w http.ResponseWriter, r *http.Request) {
+	var req ResetPasswordRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		http.Error(w, "invalid request", http.StatusBadRequest)
+		return
+	}
+
+	err := auth.ResetPassword(req.Token, req.NewPassword)
+	if err != nil {
+		http.Error(w, "invalid or expired token", http.StatusUnauthorized)
+		return
+	}
+
+	w.Write([]byte("password reset successful"))
+}
+
 func SetupRoutes() {
 	http.Handle("/register", CORSMiddleware(RateLimitMiddleware(http.HandlerFunc(RegisterHandler))))
 	http.Handle("/login", CORSMiddleware(RateLimitMiddleware(http.HandlerFunc(LoginHandler))))
 	http.Handle("/forgot-password", CORSMiddleware(RateLimitMiddleware(http.HandlerFunc(ForgotPasswordHandler))))
+	http.Handle("/reset-password", CORSMiddleware(RateLimitMiddleware(http.HandlerFunc(ResetPasswordHandler))))
 }

@@ -2,6 +2,7 @@ package auth
 
 import (
 	"context"
+	"fmt"
 	"real-time-chat/internal/db"
 )
 
@@ -17,4 +18,25 @@ func RegisterUser(username, password string) error {
 		username, hash,
 	)
 	return err
+}
+
+func ResetPassword(token, newPassword string) error {
+	userID, err := db.GetUserIDByResetToken(token)
+	if err != nil {
+		return fmt.Errorf("invalid or expired token")
+	}
+
+	hash, err := GeneratePasswordHash(newPassword)
+	if err != nil {
+		return fmt.Errorf("could not hash password: %w", err)
+	}
+
+	err = db.UpdateUserPassword(userID, hash)
+	if err != nil {
+		return fmt.Errorf("could not update password: %w", err)
+	}
+
+	_ = db.DeletePasswordResetToken(token)
+
+	return nil
 }

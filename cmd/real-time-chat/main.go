@@ -25,9 +25,12 @@ func main() {
 	}
 	defer db.Close()
 
+	go server.Hub.Run()
+
 	server.SetupRoutes()
 
 	http.Handle("/swagger/", httpSwagger.WrapHandler)
+	http.Handle("/", http.FileServer(http.Dir("./web")))
 
 	log.Println("Server listening on port :8000")
 	if err := http.ListenAndServe(":8000", nil); err != nil {

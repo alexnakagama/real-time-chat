@@ -1,5 +1,7 @@
 package chat
 
+import "encoding/json"
+
 type Hub struct {
 	Rooms      map[int]*Room
 	Register   chan *Client
@@ -54,10 +56,14 @@ func (h *Hub) handleUnregister(client *Client) {
 }
 
 func (h *Hub) handleBroadcast(message *Message) {
+	data, err := json.Marshal(message)
+	if err != nil {
+		return
+	}
 	if room, ok := h.Rooms[message.RoomID]; ok {
 		for _, client := range room.Clients {
 			select {
-			case client.Send <- []byte(message.Content):
+			case client.Send <- data:
 			default:
 				close(client.Send)
 				delete(room.Clients, client.ID)

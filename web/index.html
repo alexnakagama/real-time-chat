@@ -1,11 +1,94 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Document</title>
+    <title>Real Time Chat</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    
+
+    <!-- AUTH SECTION -->
+    <div id="auth-section" class="auth-container">
+
+        <!-- Login -->
+        <div id="login-view" class="card">
+            <h2>Iniciar Sesión</h2>
+            <div id="login-error" class="error-msg hidden"></div>
+            <form id="login-form">
+                <input type="text" id="login-username" placeholder="Usuario" required />
+                <input type="password" id="login-password" placeholder="Contraseña" required />
+                <button type="submit">Entrar</button>
+            </form>
+            <div class="links">
+                <a href="#" id="go-register">¿No tienes cuenta? Regístrate</a>
+                <a href="#" id="go-forgot">¿Olvidaste tu contraseña?</a>
+            </div>
+        </div>
+
+        <!-- Register -->
+        <div id="register-view" class="card hidden">
+            <h2>Crear Cuenta</h2>
+            <div id="register-error" class="error-msg hidden"></div>
+            <div id="register-success" class="success-msg hidden"></div>
+            <form id="register-form">
+                <input type="text" id="register-username" placeholder="Usuario" required />
+                <input type="email" id="register-email" placeholder="Email" required />
+                <input type="password" id="register-password" placeholder="Contraseña" required />
+                <button type="submit">Registrarse</button>
+            </form>
+            <div class="links">
+                <a href="#" id="go-login">¿Ya tienes cuenta? Inicia sesión</a>
+            </div>
+        </div>
+
+        <!-- Forgot Password -->
+        <div id="forgot-view" class="card hidden">
+            <h2>Recuperar Contraseña</h2>
+            <div id="forgot-msg" class="success-msg hidden"></div>
+            <form id="forgot-form">
+                <input type="email" id="forgot-email" placeholder="Email" required />
+                <button type="submit">Enviar enlace</button>
+            </form>
+            <div class="links">
+                <a href="#" id="go-login-2">Volver al inicio de sesión</a>
+            </div>
+        </div>
+
+    </div>
+
+    <!-- CHAT SECTION -->
+    <div id="chat-section" class="chat-container hidden">
+        <div class="chat-sidebar">
+            <div class="sidebar-header">
+                <div class="user-badge">
+                    <span class="user-icon">💬</span>
+                    <span id="user-display"></span>
+                </div>
+                <button id="logout-btn">Salir</button>
+            </div>
+            <div class="room-join">
+                <p class="sidebar-label">Unirse a una sala</p>
+                <input type="number" id="room-input" placeholder="ID de sala" min="1" />
+                <button id="join-room-btn">Unirse</button>
+            </div>
+            <div id="room-info" class="room-info hidden">
+                <span class="dot"></span>
+                <span id="current-room-label"></span>
+            </div>
+        </div>
+        <div class="chat-main">
+            <div id="no-room-msg" class="no-room-msg">
+                <p>👈 Ingresa un ID de sala y únete para empezar a chatear</p>
+            </div>
+            <div id="messages" class="messages-area"></div>
+            <form id="msg-form" class="msg-form">
+                <input type="text" id="msg-input" placeholder="Escribe un mensaje..." autocomplete="off" disabled />
+                <button type="submit" id="send-btn" disabled>Enviar</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
 </body>
 </html>

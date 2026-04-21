@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"real-time-chat/config"
+	"real-time-chat/internal/models"
 
 	"github.com/jackc/pgx/v5/pgxpool"
 )
@@ -29,4 +30,14 @@ func Close() {
 	if Pool != nil {
 		Pool.Close()
 	}
+}
+
+func GetUserByUsername(username string) (*models.User, error) {
+	var user models.User
+	query := "SELECT id, username, password_hash FROM users WHERE username = $1"
+	err := Pool.QueryRow(context.Background(), query, username).Scan(&user.ID, &user.Username, &user.PasswordHash)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
 }

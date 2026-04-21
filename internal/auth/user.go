@@ -7,6 +7,9 @@ import (
 	"fmt"
 	"strings"
 
+	"real-time-chat/internal/db"
+	"real-time-chat/internal/models"
+
 	"golang.org/x/crypto/argon2"
 )
 
@@ -36,4 +39,15 @@ func VerifyPasswordHash(password, encodedHash string) bool {
 	}
 	testHash := argon2.IDKey([]byte(password), salt, 1, 64*1024, 4, 32)
 	return subtle.ConstantTimeCompare(hash, testHash) == 1
+}
+
+func AuthenticateUser(username, password string) (*models.User, error) {
+	user, err := db.GetUserByUsername(username)
+	if err != nil {
+		return nil, fmt.Errorf("user not found")
+	}
+	if !VerifyPasswordHash(password, user.PasswordHash) {
+		return nil, fmt.Errorf("invalid credentials")
+	}
+	return user, nil
 }
